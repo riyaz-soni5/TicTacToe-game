@@ -1,19 +1,20 @@
 // constructor for making a player object contains sign as parameters 
 const Player=((sign)=>{
 
-  let PlayerSign = sign;
   let playerWinCount = 0;
 
 
   //method to get the player sign 
-  const getSign = ()=> PlayerSign;
+  const getSign = ()=> sign;
+  const playerWinCountIncrease = ()=> playerWinCount++
+  const getPlayerWinCount = ()=> playerWinCount;
 
 
   const resetWinCount = ()=> playerWinCount = 0;
 
 
 
-  return {getSign,playerWinCount,resetWinCount}
+  return {getSign,playerWinCount,resetWinCount,playerWinCountIncrease,getPlayerWinCount}
 });
 
 // Gameboard object
@@ -25,7 +26,7 @@ const Gameboard = (()=>{
 
   // method to place sign in the gameboard array
   const insertInBoard = (indexvalue,sign)=>{
-    if(indexvalue>gameboard.length) return
+    if(indexvalue>=gameboard.length) return
     gameboard[indexvalue] = sign;
   }
 
@@ -58,27 +59,30 @@ const GameControl = (()=>{
 
   // creating two players: player1 and player 2 using Player constructor 
   let player1 = Player("X");
-  let player2 = Player("0");
+  let player2 = Player("O");
   
 
   // round varible to track the rounds 
   let round=1;
-  let moves=1;
+  let moves=0;
 
   // tracks if the round is over or not
   let isOver = false;
-  let GameOver = false
+  let movesOver = false;
   
   // method to play a round where index value is taken at parameters 
   const playRound = (indexValue)=>{
 
     if(Gameboard.getboard(indexValue)===''){
 
-      Gameboard.insertInBoard(indexValue, getCurrentPlayer().getSign());``
+      Gameboard.insertInBoard(indexValue, getCurrentPlayer().getSign());
       // checks winner 
 
-      if(checkWinner(indexValue)|| moves>=9){
+      if(checkWinner(indexValue)){
         isOver=true
+      }
+      else if(moves>=8){
+        movesOver = true;
       }
       else{
         moves++;
@@ -90,9 +94,6 @@ const GameControl = (()=>{
     }
 
   }
-
-
-  
   
   // method to get current player sign 
   const getCurrentPlayer = ()=>{
@@ -119,12 +120,51 @@ const GameControl = (()=>{
     
   }
 
+
+  const ValidInput = ()=>{
+    let vaildInput = false;
+    let playerMove;
+
+      while(!vaildInput){
+        playerMove = prompt(`Its ${GameControl.getCurrentPlayer().getSign()} turn, Place your move`);
+
+        if(playerMove!=''){
+
+          if(!isNaN(playerMove)){
+            playerMove = parseInt(playerMove);
+            if(playerMove>0 && playerMove<=9){
+              vaildInput = true;
+              return playerMove
+            }
+            else{
+              console.log("\nPlease input from range 1-9\n");
+             
+            }
+  
+          }
+          else{
+            console.log(`\nYour input ${playerMove} is invalid, Please enter vaild input(1-9)`);
+          }  
+
+        }
+        else{
+          console.log("\nEmpty Input is not excepted! Please enter a vaild input (1-9)");
+        }
+
+
+      }
+  }
+
+
   
   const getIsOver = ()=> isOver
+
+  const getMovesOver = ()=> movesOver
 
   const getMoves = ()=> moves;
 
   const setIsOverFalse = ()=> isOver = false;
+  const setMovesOverFalse = ()=> movesOver = false
   
   const getRound= ()=> round;
 
@@ -132,10 +172,20 @@ const GameControl = (()=>{
     round++;
     moves=0;
   }
+
+  const displayBoard = ()=>{
+    const matrixarray = [...Gameboard.getFullBoard()];
+
+    console.log("\n")
+    for(let i=0;i<3;i++){
+      console.log(matrixarray.splice(0,3))
+    }
+
+  }
   
   
   
-  return {getCurrentPlayer,getIsOver,playRound,getRound,getMoves,setIsOverFalse,nextRound}
+  return {getCurrentPlayer,getIsOver,playRound,getRound,getMoves,setIsOverFalse,nextRound,displayBoard,ValidInput,getMovesOver,setMovesOverFalse}
   
   
 })();
@@ -144,66 +194,40 @@ const GameControl = (()=>{
 // display controller object 
 const displayControl = (()=>{
 
-  const displayBoard = ()=>{
+  
 
-    const matrixarray = [...Gameboard.getFullBoard()];
-
-    console.log("\n")
-    for(let i=0;i<3;i++){
-      console.log(matrixarray.splice(0,3))
-    }
-
-    
-  }
   
   do{
-    displayBoard();
+    GameControl.displayBoard();
+    
     if(GameControl.getIsOver()){
-      if(GameControl.getMoves()>=9){
-        console.log("It's a tie");
+
+      GameControl.getCurrentPlayer().playerWinCountIncrease();
+      
+      if(GameControl.getCurrentPlayer().getPlayerWinCount()>=3){
+        console.log(`Game Over! ${GameControl.getCurrentPlayer().getSign()} WON!`);
+        break;
+      }
+      else{
+        console.log(`${GameControl.getCurrentPlayer().getSign()} wins this round!`);
         GameControl.nextRound();
         GameControl.setIsOverFalse();
         Gameboard.resetboard();
-
       }
-      else{
-        GameControl.getCurrentPlayer().playerWinCount++;
+    }
+    else if(GameControl.getMovesOver()){
+      console.log("It's a tie");
+      GameControl.nextRound();
+      GameControl.setMovesOverFalse();
+      Gameboard.resetboard();
 
-        if(GameControl.getCurrentPlayer().playerWinCount>=3){
-          console.log(`Game Over! ${GameControl.getCurrentPlayer().getSign()} WON!`);
-          break;
-        }
-        else{
-          console.log(`${GameControl.getCurrentPlayer().getSign()} wins this round!`);
-          GameControl.nextRound();
-          GameControl.setIsOverFalse();
-          Gameboard.resetboard();
-        }
-          
-          
-        }
-      }
+      
+    }
     else{
-      let playerMove = parseInt(prompt(`Its ${GameControl.getCurrentPlayer().getSign()} turn, Place your move`));
-      GameControl.playRound(playerMove);
+      let validPlayerMove = GameControl.ValidInput();
+      GameControl.playRound(validPlayerMove-1);
 
     }
 
-  }while(GameControl.getMoves()<=9)
+  }while(GameControl.getMoves()<=8)
 })();
-
-
-
-
-
-
-
-// task to do today 
-
-// check winning of a player
-
-// roundOver and GameOver are two different thing
-
-// round is over when a player wins a round but game over is when a player wins 3 times 
-
-//
