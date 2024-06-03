@@ -6,7 +6,7 @@ const Player=((sign)=>{
 
   //method to get the player sign 
   const getSign = ()=> sign;
-  const playerWinCountIncrease = ()=> playerWinCount++
+  const playerWinCountIncrease = ()=> playerWinCount+=1;
   const getPlayerWinCount = ()=> playerWinCount;
 
 
@@ -60,6 +60,7 @@ const GameControl = (()=>{
   // creating two players: player1 and player 2 using Player constructor 
   let player1 = Player("X");
   let player2 = Player("O");
+
   
 
   // round varible to track the rounds 
@@ -73,26 +74,18 @@ const GameControl = (()=>{
   // method to play a round where index value is taken at parameters 
   const playRound = (indexValue)=>{
 
-    if(Gameboard.getboard(indexValue)===''){
+    Gameboard.insertInBoard(indexValue,getCurrentPlayer().getSign());
 
-      Gameboard.insertInBoard(indexValue, getCurrentPlayer().getSign());
-      // checks winner 
-
-      if(checkWinner(indexValue)){
-        isOver=true
-      }
-      else if(moves>=8){
-        movesOver = true;
-      }
-      else{
-        moves++;
-      }
-    
-
-    }else{
-      console.log("Place Already occupied");
+    if(checkWinner(indexValue)){
+      getCurrentPlayer().playerWinCountIncrease();
+      isOver=true;
     }
-
+    else if(moves>=8){
+      movesOver = true;
+    }
+    else{
+      moves++;
+    }
   }
   
   // method to get current player sign 
@@ -121,71 +114,49 @@ const GameControl = (()=>{
   }
 
 
-  const ValidInput = ()=>{
-    let vaildInput = false;
-    let playerMove;
-
-      while(!vaildInput){
-        playerMove = prompt(`Its ${GameControl.getCurrentPlayer().getSign()} turn, Place your move`);
-
-        if(playerMove!=''){
-
-          if(!isNaN(playerMove)){
-            playerMove = parseInt(playerMove);
-            if(playerMove>0 && playerMove<=9){
-              vaildInput = true;
-              return playerMove
-            }
-            else{
-              console.log("\nPlease input from range 1-9\n");
-             
-            }
-  
-          }
-          else{
-            console.log(`\nYour input ${playerMove} is invalid, Please enter vaild input(1-9)`);
-          }  
-
-        }
-        else{
-          console.log("\nEmpty Input is not excepted! Please enter a vaild input (1-9)");
-        }
-
-
-      }
-  }
-
 
   
-  const getIsOver = ()=> isOver
+  const getIsOver = ()=> isOver;
 
   const getMovesOver = ()=> movesOver
 
   const getMoves = ()=> moves;
-
-  const setIsOverFalse = ()=> isOver = false;
-  const setMovesOverFalse = ()=> movesOver = false
   
   const getRound= ()=> round;
 
-  const nextRound = ()=>{
-    round++;
-    moves=0;
+  let boardGui = document.querySelectorAll('.board-item');
+
+
+  const resetGuiBoard = ()=>{
+    boardGui.forEach((item)=>{
+      item.innerText = '';
+    })
   }
 
-  const displayBoard = ()=>{
-    const matrixarray = [...Gameboard.getFullBoard()];
 
-    console.log("\n")
-    for(let i=0;i<3;i++){
-      console.log(matrixarray.splice(0,3))
+
+  const resetGame = (nextGame = false)=>{
+    Gameboard.resetboard();
+    resetGuiBoard();
+    if(nextGame){
+      round =1;
+      player1.resetWinCount();
+      player2.resetWinCount();
+
     }
+    else{
+      round++;
 
+    }
+    moves=0;
+    isOver = false;
+    movesOver = false;
+    
   }
+
   
   
-  
-  return {getCurrentPlayer,getIsOver,playRound,getRound,getMoves,setIsOverFalse,nextRound,displayBoard,ValidInput,getMovesOver,setMovesOverFalse}
+  return {player1,player2,getCurrentPlayer,getIsOver,playRound,getRound,getMoves,resetGame,getMovesOver,boardGui}
   
   
 })();
@@ -194,40 +165,80 @@ const GameControl = (()=>{
 // display controller object 
 const displayControl = (()=>{
 
-  
 
+  let player1signDisplay = document.querySelector('#player-1-marker');
+  let player2signDisplay = document.querySelector("#player-2-marker");
+
+  player1signDisplay.innerText = GameControl.player1.getSign();
+  player2signDisplay.innerText = GameControl.player2.getSign();
+
+  let player1winCount = document.querySelector("#player1-win-count");
+  let player2winCount = document.querySelector('#player2-win-count');
+  let tieCounter = document.querySelector('#tie-count');
+
+  let tie =0;
+
+  let closeBtn = document.querySelector('#close-button');
   
-  do{
-    GameControl.displayBoard();
+  closeBtn.addEventListener('click',()=>{
+    GameControl.resetGame(true);
+    player1winCount.innerText = '0';
+    player2winCount.innerText = '0';
+    tieCounter.innerText ='0';
+    roundOverModal.close();
+
+  })
+
+  let roundOverModal = document.querySelector('dialog');
+  let winner = document.querySelector('#winner');
+
+  let winnerBoard = document.querySelector('#win-board');
+
+
+  const displayUpdatedWinCount = ()=>{
+    player1winCount.innerText = String(GameControl.player1.getPlayerWinCount());
+    player2winCount.innerText = String(GameControl.player2.getPlayerWinCount());
+  }
+
+
+  const displayRoundWinner = ()=>{
+    winnerBoard.innerText = `${GameControl.getCurrentPlayer().getSign()} WINS!`;
+    winnerBoard.style.visibility = "visible";
+  }
+
+  GameControl.boardGui.forEach((item,index) => {
+    item.addEventListener('click',(e)=>{
+      if(e.target.innerText == ''){
+
+        e.target.innerText = GameControl.getCurrentPlayer().getSign();
+        GameControl.playRound(index);
+
+
+        if(GameControl.getIsOver()){
+          if(GameControl.getCurrentPlayer().getPlayerWinCount()>=3){
+            winnerBoard.innerText = '';
+            winner.innerText = `${GameControl.getCurrentPlayer().getSign()} is the Winner!`;
+            roundOverModal.showModal();
+          }
+          else{
+            displayRoundWinner();
+            displayUpdatedWinCount();
+            GameControl.resetGame();
+          }
+        }
+        else if(GameControl.getMovesOver()){
+            tie+=1
+            tieCounter.innerText = `${tie}`;
+            winnerBoard.innerText = 'TIE!';
+            winnerBoard.style.visibility = "visible";
+            GameControl.resetGame();
+        }
+
+      }
+
+    })
     
-    if(GameControl.getIsOver()){
+  });
 
-      GameControl.getCurrentPlayer().playerWinCountIncrease();
-      
-      if(GameControl.getCurrentPlayer().getPlayerWinCount()>=3){
-        console.log(`Game Over! ${GameControl.getCurrentPlayer().getSign()} WON!`);
-        break;
-      }
-      else{
-        console.log(`${GameControl.getCurrentPlayer().getSign()} wins this round!`);
-        GameControl.nextRound();
-        GameControl.setIsOverFalse();
-        Gameboard.resetboard();
-      }
-    }
-    else if(GameControl.getMovesOver()){
-      console.log("It's a tie");
-      GameControl.nextRound();
-      GameControl.setMovesOverFalse();
-      Gameboard.resetboard();
 
-      
-    }
-    else{
-      let validPlayerMove = GameControl.ValidInput();
-      GameControl.playRound(validPlayerMove-1);
-
-    }
-
-  }while(GameControl.getMoves()<=8)
 })();

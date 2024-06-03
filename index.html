@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body id="grid-div">
+    <header class="grid-div-item header">
+      <h1>Tic Tac Toe</h1>
+    </header>
+    <main class="grid-div-item main">
+      <div class="player-display">
+        <div class="player" id="player-1">
+          <div>Player 1</div>
+          <div id="player-1-marker" style="color: red;">placeholder for marker</div>
+        </div>
+        <div id="win-board"></div>
+        <div class="player" id="player-2">
+          <div>Player 2</div>
+          <div id="player-2-marker" style="color: blue;">placeholder for marker</div>
+        </div>
+      </div>
+      <div class="board">
+        <div class="board-item"></div>
+        <div class="board-item"></div>
+        <div class="board-item"></div>
+        <div class="board-item"></div>
+        <div class="board-item"></div>
+        <div class="board-item"></div>
+        <div class="board-item"></div>
+        <div class="board-item"></div>
+        <div class="board-item"></div>
+      </div>
+      <div class="score-board">
+        <div class="score-item">
+          <div>Player 1:</div>
+          <div id="player1-win-count">0</div>
+        </div>
+        <div class="score-item">
+          <div>Tie:</div>
+          <div id="tie-count">0</div>
+        </div>
+        <div class="score-item">
+          <div>Player 2:</div>
+          <div id="player2-win-count">0</div>
+        </div>
+      </div>
+
+      <dialog class="displayMsg">
+        <div>
+          <div id="gameOverMsg">
+            <h1 id="winner"></h1>
+            <h1>Game Over!</h1>
+            <button id="close-button">Close</button>
+          </div>
+
+        </div>
+      </dialog>
+    </main>
+    <footer class="grid-div-item footer" style="text-align: center">
+      &copy; Mr Robot
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

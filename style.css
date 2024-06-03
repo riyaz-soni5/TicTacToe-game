@@ -1,0 +1,143 @@
+
+/* importing font for the website */
+@font-face {
+    font-family: "Pixelify";
+    src: url("fonts/static/PixelifySans-Regular.ttf");
+}
+
+
+/* universal selector for fonts and avoid defualt margin and padding */
+*{
+   margin: 0%;
+    font-family: "Pixelify",monospace,Arial, Helvetica, sans-serif;
+}
+
+/* main layout of the website */
+#grid-div{
+    display: grid;
+    height: 100vh;
+    width: 100vw;
+    grid-template: 20% 75% 5% / 1fr;
+}
+
+
+.grid-div-item{
+    border: 2px solid black;
+}
+
+
+/* header section styles */
+header{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+header h1{
+    font-size: xxx-large;
+}
+
+.board{
+    display: grid;
+    grid-template: repeat(3,1fr)/repeat(3,120px);
+    background-color: black;
+    gap: 5px;
+    height: 400px;
+}
+
+main{
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center ;
+    align-items: center;
+
+}
+
+
+.board-item{
+    display: flex;
+    background-color: white;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-size: 500%;
+}
+
+
+/* player for displaying marker and player number */
+
+.player-display{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 65px;
+    margin: 5px;
+    padding: 5px;
+}
+.player{
+   display: flex;
+   flex-direction: column;
+   border: 2px solid black;
+   height: 50px;
+   padding: 5px;
+   justify-content: center;
+   align-items: center;
+}
+
+#win-board{
+    visibility: hidden;
+    font-size: larger;
+}
+
+
+
+.score-board{
+    margin: 20px;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    gap: 50px;
+}
+
+
+.score-item{
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+
+
+}
+
+
+
+.displayMsg{
+    background-color: rgba(255, 255, 255, 0.452);
+    height: 100%;
+    width: 100%;
+    z-index: 20;
+    
+    
+
+}
+
+.displayMsg > div{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.displayMsg>div>div{
+    width: 300px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid grey;
+    background-color: white;
+    padding: 10px;
+    gap: 20px;
+    text-align: center;
+
+}
